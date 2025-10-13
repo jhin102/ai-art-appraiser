@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Art Appraiser - 게임 기획 발표</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .presentation {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .slide {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            margin: 30px 0;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide h1 {
+            color: #4a5568;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide h2 {
+            color: #2d3748;
+            font-size: 1.8em;
+            margin: 30px 0 15px 0;
+            border-left: 5px solid #667eea;
+            padding-left: 20px;
+        }
+
+        .slide h3 {
+            color: #4a5568;
+            font-size: 1.4em;
+            margin: 20px 0 10px 0;
+        }
+
+        .grid {
+            display: grid;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .grid-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .grid-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            text-align: center;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .metric h4 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .metric p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .timeline {
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: #f7fafc;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        .warning {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        .canvas-demo {
+            width: 200px;
+            height: 150px;
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f7fafc;
+            margin: 20px auto;
+            font-size: 1.1em;
+            color: #667eea;
+        }
+
+        .user-journey {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .journey-step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .journey-step::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5em;
+            color: #667eea;
+        }
+
+        .journey-step:last-child::after {
+            display: none;
+        }
+
+        .journey-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .bmcanvas {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .bm-section {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            font-size: 0.9em;
+        }
+
+        .bm-section h4 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .bm-key-partners { grid-column: 1; grid-row: 1; }
+        .bm-key-activities { grid-column: 2; grid-row: 1; }
+        .bm-value-props { grid-column: 3; grid-row: 1/3; background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .bm-customer-relations { grid-column: 4; grid-row: 1; }
+        .bm-customer-segments { grid-column: 5; grid-row: 1; }
+        .bm-key-resources { grid-column: 2; grid-row: 2; }
+        .bm-channels { grid-column: 4; grid-row: 2; }
+        .bm-cost-structure { grid-column: 1/3; grid-row: 3; }
+        .bm-revenue-streams { grid-column: 4/6; grid-row: 3; }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-journey {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .journey-step::after {
+                display: none;
+            }
+            
+            .bmcanvas {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(9, auto);
+            }
+            
+            .bm-section {
+                grid-column: 1 !important;
+                grid-row: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Title Slide -->
+        <div class="slide">
+            <h1>🎨 AI Art Appraiser</h1>
+            <div style="text-align: center; margin: 40px 0;">
+                <div class="canvas-demo">
+                    🖌️ 그리기 → 🤖 AI 평가 → 🏆 랭킹
+                </div>
+                <p style="font-size: 1.3em; color: #4a5568; margin-top: 20px;">
+                    <strong>"누구나 쉽게 그리고, AI가 공정하게 평가하는 창작 놀이터"</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Problem & Solution -->
+        <div class="slide">
+            <h2>💡 문제 정의 및 해결 방안</h2>
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3 style="color: #e53e3e;">😰 사용자 Pain Points</h3>
+                    <ul style="margin-top: 15px; line-height: 1.8;">
+                        <li>"내 그림 실력이 객관적으로 어느 정도인지 모르겠어"</li>
+                        <li>"그림 그리기 동기부여가 부족해"</li>
+                        <li>"그림을 그려도 피드백받을 곳이 없어"</li>
+                        <li>"혼자 그리면 재미없어"</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 style="color: #38a169;">✨ 우리의 Solutions</h3>
+                    <ul style="margin-top: 15px; line-height: 1.8;">
+                        <li><span class="highlight">AI 기반 일관된 평가</span> → 객관적 피드백</li>
+                        <li><span class="highlight">랭킹, 갤러리 전시</span> → 성취감 & 인정</li>
+                        <li><span class="highlight">즉시 AI 코멘트</span> → 즉각적 반응</li>
+                        <li><span class="highlight">커뮤니티 경쟁</span> → 사회적 연결</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Target Users -->
+        <div class="slide">
+            <h2>🎯 타겟 사용자 및 STP</h2>
+            <div class="grid grid-3">
+                <div class="card">
+                    <h3>👥 Primary Target</h3>
+                    <p><strong>창작 활동 관심층 (20-30대)</strong></p>
+                    <ul style="margin-top: 10px; line-height: 1.6;">
+                        <li>취미 그림 그리는 직장인</li>
+                        <li>예술 관련 전공생/졸업생</li>
+                        <li>창작 콘텐츠 소비자</li>
+                    </ul>
+                    <p style="margin-top: 15px; font-size: 0.9em; color: #666;">
+                        <strong>시장 규모:</strong> 국내 약 50만명 추정
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>🎮 Secondary Target</h3>
+                    <p><strong>엔터테인먼트 추구층</strong></p>
+                    <ul style="margin-top: 10px; line-height: 1.6;">
+                        <li>새로운 온라인 게임 탐색자</li>
+                        <li>경쟁 게임 선호자</li>
+                        <li>소셜 미디어 활동가</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>🎨 Positioning</h3>
+                    <p style="font-weight: 600; color: #667eea; margin-bottom: 10px;">
+                        "AI 평가하는 창작 놀이터"
+                    </p>
+                    <ul style="line-height: 1.6; font-size: 0.95em;">
+                        <li>vs Skribbl.io: 평가와 성장 중심</li>
+                        <li>vs Instagram: 전문성보다 재미</li>
+                        <li>vs 그림 교육: 학습보다 놀이</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Journey -->
+        <div class="slide">
+            <h2>🚀 User Journey Map</h2>
+            <h3>신규 사용자 여정</h3>
+            <div class="user-journey">
+                <div class="journey-step">
+                    <div class="journey-icon">👀</div>
+                    <p><strong>발견</strong><br>SNS/광고 노출</p>
+                </div>
+                <div class="journey-step">
+                    <div class="journey-icon">🎨</div>
+                    <p><strong>첫 경험</strong><br>튜토리얼 + 첫 그림</p>
+                </div>
+                <div class="journey-step">
+                    <div class="journey-icon">🤖</div>
+                    <p><strong>평가 확인</strong><br>AI 점수/코멘트</p>
+                </div>
+                <div class="journey-step">
+                    <div class="journey-icon">🏆</div>
+                    <p><strong>탐색</strong><br>랭킹/갤러리 구경</p>
+                </div>
+                <div class="journey-step">
+                    <div class="journey-icon">❤️</div>
+                    <p><strong>정착</strong><br>일일 3회 모두 사용</p>
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 30px;">일일 사용자 Loop</h3>
+            <div style="background: #f7fafc; padding: 20px; border-radius: 10px; margin-top: 15px;">
+                <p style="text-align: center; font-size: 1.1em; line-height: 1.8;">
+                    <strong>접속</strong> (30초) → <strong>창작</strong> (5-15분) → <strong>평가</strong> (10초) → 
+                    <strong>만족</strong> (1분) → <strong>탐색</strong> (3-5분) → <strong>재도전</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Competition Analysis -->
+        <div class="slide">
+            <h2>🔍 경쟁 서비스 벤치마킹</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>서비스</th>
+                        <th>특징</th>
+                        <th>강점</th>
+                        <th>약점</th>
+                        <th>우리의 차별점</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Skribbl.io</strong></td>
+                        <td>온라인 그림 맞추기</td>
+                        <td>실시간 멀티플레이</td>
+                        <td>평가 시스템 없음</td>
+                        <td>AI 기반 객관적 평가</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AutoDraw</strong></td>
+                        <td>AI 그림 보정</td>
+                        <td>구글 브랜드 파워</td>
+                        <td>평가/경쟁 없음</td>
+                        <td>게임화된 경쟁 시스템</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Instagram</strong></td>
+                        <td>창작물 공유</td>
+                        <td>거대한 사용자 베이스</td>
+                        <td>객관적 평가 부재</td>
+                        <td>AI 기반 즉시 피드백</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="card" style="margin-top: 20px; background: linear-gradient(135deg, #48bb78, #38a169); color: white;">
+                <h3>🌊 Blue Ocean 영역</h3>
+                <p style="font-size: 1.1em; line-height: 1.6; margin-top: 10px;">
+                    <strong>AI 기반 즉시 평가 + 게임화 결합</strong><br>
+                    전문성 없이도 객관적 피드백 제공하며, 창작 과정을 엔터테인먼트화
+                </p>
+            </div>
+        </div>
+
+        <!-- MVP Definition -->
+        <div class="slide">
+            <h2>🚀 MVP 정의</h2>
+            <div class="card" style="text-align: center; margin-bottom: 30px;">
+                <h3 style="color: #667eea; font-size: 1.5em;">"AI가 평가하는 나만의 미술관"</h3>
+            </div>
+            
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3 style="color: #38a169;">✅ MVP 필수 기능</h3>
+                    <ul style="margin-top: 15px; line-height: 1.8;">
+                        <li><span class="highlight">간단한 그리기 도구</span> - 기본 브러시, 색상</li>
+                        <li><span class="highlight">AI 평가 시스템</span> - Claude API 연동</li>
+                        <li><span class="highlight">개인 갤러리</span> - 내 작품 보관함</li>
+                        <li><span class="highlight">일일 제한</span> - 3회 평가 제한</li>
+                        <li><span class="highlight">랭킹 시스템</span> - 주간/월간 순위</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 style="color: #e53e3e;">❌ 향후 개발 기능</h3>
+                    <ul style="margin-top: 15px; line-height: 1.8;">
+                        <li><span class="warning">소셜 공유</span> - SNS 연동</li>
+                        <li><span class="warning">고급 도구</span> - 레이어, 필터</li>
+                        <li><span class="warning">NFT 연동</span> - 블록체인 기능</li>
+                        <li><span class="warning">실시간 채팅</span> - 커뮤니케이션</li>
+                        <li><span class="warning">테마 챌린지</span> - 이벤트 시스템</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px;">AI 평가 시스템</h3>
+            <div style="background: #f7fafc; padding: 20px; border-radius: 10px; margin-top: 15px;">
+                <div class="grid grid-2">
+                    <div>
+                        <h4>평가 기준</h4>
+                        <ul style="margin-top: 10px; line-height: 1.6;">
+                            <li>창의성: 0-30점</li>
+                            <li>기술적 완성도: 0-30점</li>
+                            <li>예술성: 0-25점</li>
+                            <li>독창성: 0-15점</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>결과 제공</h4>
+                        <ul style="margin-top: 10px; line-height: 1.6;">
+                            <li>총점 기반 가격 책정</li>
+                            <li>AI 코멘트 제공</li>
+                            <li>카테고리 분류</li>
+                            <li>개선점 제안</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Model -->
+        <div class="slide">
+            <h2>💰 Business Model Canvas</h2>
+            <div class="bmcanvas">
+                <div class="bm-section bm-key-partners">
+                    <h4>핵심 파트너</h4>
+                    <ul>
+                        <li>Anthropic (Claude API)</li>
+                        <li>웹호스팅 서비스</li>
+                        <li>결제 서비스</li>
+                        <li>마케팅 에이전시</li>
+                    </ul>
+                </div>
+                <div class="bm-section bm-key-activities">
+                    <h4>핵심 활동</h4>
+                    <ul>
+                        <li>AI 모델 운영</li>
+                        <li>커뮤니티 관리</li>
+                        <li>콘텐츠 큐레이션</li>
+                        <li>서비스 개선</li>
+                    </ul>
+                </div>
+                <div class="bm-section bm-value-props">
+                    <h4>가치 제안</h4>
+                    <p style="font-size: 1.1em; font-weight: 600; margin-bottom: 10px;">AI 기반 객관적 그림 평가</p>
+                    <ul>
+                        <li>즉시 피드백</li>
+                        <li>게임화된 창작</li>
+                        <li>커뮤니티 경쟁</li>
+                        <li>실력 향상 도구</li>
+                    </ul>
+                </div>
+                <div class="bm-section bm-customer-relations">
+                    <h4>고객 관계</h4>
+                    <ul>
+                        <li>자동화된 서비스</li>
+                        <li>커뮤니티 운영</li>
+                        <li>개인화 추천</li>
+                        <li>정기 이벤트</li>
+                    </ul>
+                </div>
+                <div class="bm-section bm-customer-segments">
+                    <h4>고객 세그먼트</h4>
+                    <ul>
+                        <li>창작 애호가 (20-30대)</li>
+                        <li>캐주얼 게이머</li>
+                        <li>소셜 미디어 유저</li>
+                        <li>스킬 향상 추구층</li>
+                    </ul>
+                </div>
+                <div class="bm-section bm-key-resources">
+                    <h4>핵심 자원</h4>
+                    <ul>
+                        <li>Claude AI API</li>
+                        <li>사용자 생성 콘텐츠</li>
+                        <li>평가 데이터</li>
+                        <li>개발 팀</li>
+                    </ul>
+                </div>
+                <div class="bm-section bm-channels">
+                    <h4>채널</h4>
+                    <ul>
+                        <li>웹 플랫폼</li>
+                        <li>SNS 마케팅</li>
+                        <li>바이럴 공유</li>
+                        <li>온라인 커뮤니티</li>
+                    </ul>
+                </div>
+                <div class="bm-section bm-cost-structure">
+                    <h4>비용 구조</h4>
+                    <ul>
+                        <li>API 비용 (70%)</li>
+                        <li>서버 비용 (20%)</li>
+                        <li>마케팅 (10%)</li>
+                    </ul>
+                </div>
+                <div class="bm-section bm-revenue-streams">
+                    <h4>수익원</h4>
+                    <ul>
+                        <li>프리미엄 구독 (월 9,900원)</li>
+                        <li>추가 평가권 판매</li>
+                        <li>기업 워크샵</li>
+                        <li>교육기관 라이선스</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Roadmap -->
+        <div class="slide">
+            <h2>🗺️ 서비스 로드맵</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>Phase 1: MVP 런칭 (1-2개월)</h3>
+                        <ul style="margin-top: 10px; line-height: 1.6;">
+                            <li>기본 그리기 도구 개발</li>
+                            <li>Claude API 연동 완료</li>
+                            <li>개인 갤러리 구현</li>
+                            <li>일일 제한 시스템 적용</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>Phase 2: 커뮤니티 (2-3개월)</h3>
+                        <ul style="margin-top: 10px; line-height: 1.6;">
+                            <li>랭킹 시스템 구축</li>
+                            <li>좋아요/댓글 기능</li>
+                            <li>테마 챌린지 도입</li>
+                            <li>SNS 공유 기능</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>Phase 3: 수익화 (4-6개월)</h3>
+                        <ul style="margin-top: 10px; line-height: 1.6;">
+                            <li>프리미엄 구독 론칭</li>
+                            <li>고급 그리기 도구</li>
+                            <li>NFT 연동 검토</li>
+                            <li>B2B 서비스 확장</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PMF Metrics -->
+        <div class="slide">
+            <h2>📊 PMF 핵심 지표</h2>
+            <h3>사용자 행동 지표</h3>
+            <div class="grid grid-2">
+                <div class="metric">
+                    <h4>>20%</h4>
+                    <p>DAU/MAU 비율</p>
+                </div>
+                <div class="metric">
+                    <h4>>10분</h4>
+                    <p>평균 세션 시간</p>
+                </div>
+                <div class="metric">
+                    <h4>>70%</h4>
+                    <p>작품 완성률</p>
+                </div>
+                <div class="metric">
+                    <h4>>40%</h4>
+                    <p>7일 재방문율</p>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px;">참여도 & 만족도 지표</h3>
+            <table style="margin-top: 20px;">
+                <thead>
+                    <tr>
+                        <th>지표</th>
+                        <th>목표값</th>
+                        <th>PMF 가설</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>일일 평가 완료율</strong></td>
+                        <td><span class="highlight">>80%</span></td>
+                        <td>"사용자가 매일 3회를 모두 사용할 정도로 재미있는가?"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>갤러리 방문율</strong></td>
+                        <td><span class="highlight">>60%</span></td>
+                        <td>"다른 사용자 작품에도 관심이 있는가?"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>평가 만족도</strong></td>
+                        <td><span class="highlight">>4.0/5.0</span></td>
+                        <td>"AI 평가가 공정하고 도움이 되는가?"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NPS 점수</strong></td>
+                        <td><span class="highlight">>50</span></td>
+                        <td>"친구에게 추천할 의향이 있는가?"</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 30px;">수익성 지표</h3>
+            <div class="grid grid-3">
+                <div class="metric">
+                    <h4>>3%</h4>
+                    <p>Free→Paid 전환율<br><small>(6개월 목표)</small></p>
+                </div>
+                <div class="metric">
+                    <h4>5,000원</h4>
+                    <p>월평균 ARPU<br><small>(1년 목표)</small></p>
+                </div>
+                <div class="metric">
+                    <h4>1:3</h4>
+                    <p>CAC/LTV 비율<br><small>(1년 목표)</small></p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 30px; background: linear-gradient(135deg, #f093fb, #f5576c); color: white;">
+                <h3>🎯 PMF 달성 기준</h3>
+                <div style="margin-top: 15px; line-height: 1.8;">
+                    <p><strong>1단계:</strong> Problem-Solution Fit - 사용자 인터뷰 80% 이상 문제 공감</p>
+                    <p><strong>2단계:</strong> Product-Market Fit - 위 지표들 목표치 달성</p>
+                    <p><strong>3단계:</strong> Scale Ready - 월 신규 사용자 30% 증가율 3개월 지속</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Implementation -->
+        <div class="slide">
+            <h2>⚙️ 기술 구현 방안</h2>
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>🛠️ 기술 스택</h3>
+                    <ul style="line-height: 1.8; margin-top: 15px;">
+                        <li><strong>Frontend:</strong> React + Canvas API</li>
+                        <li><strong>Backend:</strong> Node.js + Express</li>
+                        <li><strong>Database:</strong> SQLite → PostgreSQL</li>
+                        <li><strong>AI:</strong> Claude Sonnet 4 API</li>
+                        <li><strong>Hosting:</strong> Vercel + Supabase</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>🔌 핵심 API 구조</h3>
+                    <div style="background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85em; margin-top: 10px;">
+                        <div>POST /api/evaluate</div>
+                        <div style="color: #68d391;">{</div>
+                        <div>  "image": "base64_string",</div>
+                        <div>  "user_id": "user123"</div>
+                        <div style="color: #68d391;">}</div>
+                        <br>
+                        <div style="color: #f6e05e;">// Response</div>
+                        <div style="color: #68d391;">{</div>
+                        <div>  "score": 75,</div>
+                        <div>  "price": 750,</div>
+                        <div>  "comment": "색채감 뛰어남"</div>
+                        <div style="color: #68d391;">}</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px;">데이터베이스 설계</h3>
+            <div class="grid grid-3">
+                <div class="card">
+                    <h4>👤 Users</h4>
+                    <ul style="font-size: 0.9em; line-height: 1.6;">
+                        <li>id, username</li>
+                        <li>created_at</li>
+                        <li>daily_count</li>
+                        <li>total_score</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🎨 Artworks</h4>
+                    <ul style="font-size: 0.9em; line-height: 1.6;">
+                        <li>id, user_id</li>
+                        <li>image_url, score</li>
+                        <li>ai_comment</li>
+                        <li>created_at</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🏆 Rankings</h4>
+                    <ul style="font-size: 0.9em; line-height: 1.6;">
+                        <li>user_id, username</li>
+                        <li>best_score</li>
+                        <li>total_score, rank</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="slide">
+            <h2>🚀 Next Steps</h2>
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>🎯 즉시 실행 과제</h3>
+                    <ul style="line-height: 1.8; margin-top: 15px;">
+                        <li><span class="highlight">MVP 프로토타입 개발</span> (2주)</li>
+                        <li><span class="highlight">Claude API 연동 테스트</span> (1주)</li>
+                        <li><span class="highlight">사용자 인터뷰 진행</span> (10명)</li>
+                        <li><span class="highlight">기술 스택 환경 구축</span> (1주)</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>📈 검증 계획</h3>
+                    <ul style="line-height: 1.8; margin-top: 15px;">
+                        <li><span class="warning">Problem-Solution Fit</span> 확인</li>
+                        <li><span class="warning">베타 테스트</span> (50명, 2주)</li>
+                        <li><span class="warning">핵심 지표 추적</span> 시스템 구축</li>
+                        <li><span class="warning">피드백 수집</span> 및 개선</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 30px; text-align: center; background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                <h3 style="font-size: 1.8em; margin-bottom: 15px;">🎨 AI Art Appraiser</h3>
+                <p style="font-size: 1.3em; line-height: 1.6;">
+                    "창작의 즐거움을 AI와 함께, 모든 사람이 아티스트가 되는 세상"
+                </p>
+                <div style="margin-top: 20px; font-size: 1.1em;">
+                    <p><strong>Target Launch:</strong> 2개월 내 MVP</p>
+                    <p><strong>Expected Users:</strong> 첫 해 1만명</p>
+                    <p><strong>Break-even:</strong> 1년 내</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin: 40px 0; color: #666; font-size: 0.9em;">
+            <p>🎨 Let's make everyone an artist with AI! 🎨</p>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add click animation to metrics
+            const metrics = document.querySelectorAll('.metric');
+            metrics.forEach(metric => {
+                metric.addEventListener('click', function() {
+                    this.style.animation = 'none';
+                    setTimeout(() => {
+                        this.style.animation = 'pulse 0.6s ease-in-out';
+                    }, 10);
+                });
+            });
+
+            // Smooth scroll animation for slides
+            const slides = document.querySelectorAll('.slide');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = 'slideUp 0.6s ease-out';
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            slides.forEach(slide => {
+                observer.observe(slide);
+            });
+        });
+
+        // Add pulse animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
